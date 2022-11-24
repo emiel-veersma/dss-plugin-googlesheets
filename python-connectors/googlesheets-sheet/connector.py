@@ -16,8 +16,8 @@ class MyConnector(Connector):
     def __init__(self, config):
         Connector.__init__(self, config)  # pass the parameters to the base class
         logger.info("GoogleSheets connector v1.2.0 starting with {}".format(logger.filter_secrets(config)))
-        credentials = get_credentials(config)
-        self.session = GoogleSheetsSession(credentials)
+        credentials, credentials_type = get_credentials(config)
+        self.session = GoogleSheetsSession(credentials, credentials_type)
         self.doc_id = self.config.get("doc_id")
         self.tab_id = self.config.get("tab_id")
         self.result_format = self.config.get("result_format")

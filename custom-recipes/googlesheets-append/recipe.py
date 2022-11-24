@@ -26,11 +26,11 @@ output_dataset.write_schema(input_schema)
 # Get configuration
 config = get_recipe_config()
 logger.info("config parameters: {}".format(logger.filter_secrets(config)))
-credentials = get_credentials(config)
+credentials, credentials_type = get_credentials(config)
 doc_id = config.get("doc_id")
 tab_id = config.get("tab_id")
 insert_format = config.get("insert_format")
-session = GoogleSheetsSession(credentials)
+session = GoogleSheetsSession(credentials, credentials_type)
 
 
 # Load worksheet

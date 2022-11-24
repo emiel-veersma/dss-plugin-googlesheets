@@ -15,6 +15,10 @@
             "type": "SELECT",
             "selectChoices": [
                 {
+                    "value": "single-sign-on",
+                    "label": "Single Sign On"
+                },
+                {
                     "value": "service-account",
                     "label": "Service account preset"
                 },
@@ -37,6 +41,13 @@
             "type": "PRESET",
             "parameterSetId": "service-account",
             "visibilityCondition": "model.auth_type == 'service-account'"
+        },
+        {
+            "name": "oauth_credentials",
+            "label": "Single Sign On",
+            "type": "PRESET",
+            "parameterSetId": "single-sign-on",
+            "visibilityCondition": "model.auth_type == 'single-sign-on'"
         },
         {
             "name": "doc_id",
