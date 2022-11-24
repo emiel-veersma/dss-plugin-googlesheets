@@ -2,6 +2,10 @@ import json
 import os.path
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from safe_logger import SafeLogger
+
+
+logger = SafeLogger("googlesheets plugin", ["credentials"])
 
 
 def get_credentials(input_credentials):
@@ -51,13 +55,15 @@ class GoogleSheetsSession():
             else:
                 return self.client.open_by_key(document_id).worksheets()
         except gspread.exceptions.SpreadsheetNotFound as error:
+            logger.error("{}".format(error))
             raise Exception("Trying to open non-existent or inaccessible spreadsheet document.")
         except gspread.exceptions.WorksheetNotFound as error:
+            logger.error("{}".format(error))
             raise Exception("Trying to open non-existent sheet. Verify that the sheet name exists (%s)." % tab_id)
         except gspread.exceptions.APIError as error:
             if hasattr(error, 'response'):
                 error_json = error.response.json()
-                print(error_json)
+                logger.error(error_json)
                 error_status = error_json.get("error", {}).get("status")
                 if error_status == 'PERMISSION_DENIED':
                     error_message = error_json.get("error", {}).get("message", "")

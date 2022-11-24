@@ -3,7 +3,12 @@ import datetime
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role, get_recipe_config
 from googlesheets import GoogleSheetsSession
+from safe_logger import SafeLogger
 
+
+logger = SafeLogger("googlesheets plugin", ["credentials"])
+
+logger.info("GoogleSheets custom recipe v1.2.0 starting")
 
 # Input
 input_name = get_input_names_for_role('input_role')[0]
@@ -19,6 +24,7 @@ output_dataset.write_schema(input_schema)
 
 # Get configuration
 config = get_recipe_config()
+logger.info("config parameters: {}".format(logger.filter_secrets(config)))
 credentials = config.get("credentials")
 doc_id = config.get("doc_id")
 tab_id = config.get("tab_id")
