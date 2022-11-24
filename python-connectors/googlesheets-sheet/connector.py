@@ -99,18 +99,13 @@ class MyConnector(Connector):
         """
         Returns the count of records for the dataset (or a partition).
         """
-        ws = self.get_spreadsheet()
+        worksheet = self.session.get_spreadsheet(self.doc_id, self.tab_id)
 
         if self.result_format == 'first-row-header':
-
-            return ws.row_count - 1
-
+            return worksheet.row_count - 1
         elif self.result_format in ['no-header', 'json']:
-
-            return ws.row_count
-
+            return worksheet.row_count
         else:
-
             return 0
 
 
