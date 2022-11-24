@@ -5,6 +5,7 @@ from gspread.utils import rowcol_to_a1
 from slugify import slugify
 from googlesheets import GoogleSheetsSession
 from safe_logger import SafeLogger
+from googlesheets_common import get_credentials
 
 
 logger = SafeLogger("googlesheets plugin", ["credentials"])
@@ -15,7 +16,7 @@ class MyConnector(Connector):
     def __init__(self, config):
         Connector.__init__(self, config)  # pass the parameters to the base class
         logger.info("GoogleSheets connector v1.2.0 starting with {}".format(logger.filter_secrets(config)))
-        credentials = self.config.get("credentials")
+        credentials = get_credentials(config)
         self.session = GoogleSheetsSession(credentials)
         self.doc_id = self.config.get("doc_id")
         self.tab_id = self.config.get("tab_id")
