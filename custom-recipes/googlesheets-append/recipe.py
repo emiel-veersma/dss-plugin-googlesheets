@@ -2,8 +2,7 @@
 import datetime
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role, get_recipe_config
-from googlesheets import get_spreadsheet
-from gspread.utils import rowcol_to_a1
+from googlesheets import GoogleSheetsSession
 
 
 # Input
@@ -24,10 +23,11 @@ credentials = config.get("credentials")
 doc_id = config.get("doc_id")
 tab_id = config.get("tab_id")
 insert_format = config.get("insert_format")
+session = GoogleSheetsSession(credentials)
 
 
 # Load worksheet
-ws = get_spreadsheet(credentials, doc_id, tab_id)
+worksheet = session.get_spreadsheet(doc_id, tab_id)
 
 
 # Make available a method of later version of gspread (probably 3.4.0)
@@ -52,7 +52,9 @@ def append_rows(self, values, value_input_option='RAW'):
 
     return self.spreadsheet.values_append(self.title, params, body)
 
-ws.append_rows = append_rows.__get__(ws, ws.__class__)
+
+worksheet.append_rows = append_rows.__get__(worksheet, worksheet.__class__)
+
 
 # Handle datetimes serialization
 def serializer(obj):
@@ -70,19 +72,17 @@ batch = []
 for row in input_dataset.iter_rows():
 
     # write to spreadsheet by batch
-    batch.append([serializer(v) for k,v in list(row.items())])
+    batch.append([serializer(v) for k, v in list(row.items())])
 
     if len(batch) >= 50:
-        ws.append_rows(batch, insert_format)
+        worksheet.append_rows(batch, insert_format)
         batch = []
-    
+
     # write to output dataset
     writer.write_row_dict(row)
 
 if len(batch) > 0:
-    ws.append_rows(batch, insert_format)
-
+    worksheet.append_rows(batch, insert_format)
 
 # Close writer
 writer.close()
-

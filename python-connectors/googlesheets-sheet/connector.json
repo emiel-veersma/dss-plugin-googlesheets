@@ -26,8 +26,7 @@
         {
             "name": "tab_id",
             "label": "Sheet name",
-            "type": "STRING",
-            "mandatory" : true
+            "type": "STRING"
         },
         {
             "name": "result_format",

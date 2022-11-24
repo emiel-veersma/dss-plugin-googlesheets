@@ -3,6 +3,7 @@ import os.path
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+
 def get_credentials(input_credentials):
     """
     Takes the input param 'credentials' that can accept a JSON token or a path to a file
@@ -24,35 +25,43 @@ def get_credentials(input_credentials):
 
     return credentials
 
-def get_spreadsheet(credentials, doc_id, tab_id):
-    """
-    Inputs params:
-    * credentials
-    * doc_id
-    * tab_id
-    Returns a gspread's worksheet object.
-    """
-    credentials = get_credentials(credentials)
+
+class GoogleSheetsSession():
     scope = [
         'https://www.googleapis.com/auth/spreadsheets'
     ]
-    gspread_client = gspread.authorize(ServiceAccountCredentials.from_json_keyfile_dict(credentials, scope))
 
-    try:
-        return gspread_client.open_by_key(doc_id).worksheet(tab_id)
-    except gspread.exceptions.SpreadsheetNotFound as e:
-        raise Exception("Trying to open non-existent or inaccessible spreadsheet document.")
-    except gspread.exceptions.WorksheetNotFound as e:
-        raise Exception("Trying to open non-existent sheet. Verify that the sheet name exists (%s)." % tab_id)
-    except gspread.exceptions.APIError as e:
-        if hasattr(e, 'response'):
-            error_json = e.response.json()
-            print(error_json)
-            error_status = error_json.get("error", {}).get("status")
-            email = credentials.get("client_email", "(email missing)")
-            if error_status == 'PERMISSION_DENIED':
-                error_message = error_json.get("error", {}).get("message", "")
-                raise Exception("Access was denied with the following error: %s. Have you enabled the Sheets API? Have you shared the spreadsheet with %s?" % (error_message, email))
-            if error_status == 'NOT_FOUND':
-                raise Exception("Trying to open non-existent spreadsheet document. Verify the document id exists (%s)." % doc_id)
-        raise Exception("The Google API returned an error: %s" % e)
+    def __init__(self, credentials):
+        credentials = get_credentials(credentials)
+        self.client = gspread.authorize(
+            ServiceAccountCredentials.from_json_keyfile_dict(
+                credentials,
+                self.scope
+            )
+        )
+        self.email = credentials.get("client_email", "(email missing)")
+
+    def get_spreadsheet(self, document_id, tab_id):
+        return self.get_spreadsheets(document_id, tab_id)[0]
+
+    def get_spreadsheets(self, document_id, tab_id=None):
+        try:
+            if tab_id:
+                return [self.client.open_by_key(document_id).worksheet(tab_id)]
+            else:
+                return self.client.open_by_key(document_id).worksheets()
+        except gspread.exceptions.SpreadsheetNotFound as error:
+            raise Exception("Trying to open non-existent or inaccessible spreadsheet document.")
+        except gspread.exceptions.WorksheetNotFound as error:
+            raise Exception("Trying to open non-existent sheet. Verify that the sheet name exists (%s)." % tab_id)
+        except gspread.exceptions.APIError as error:
+            if hasattr(error, 'response'):
+                error_json = error.response.json()
+                print(error_json)
+                error_status = error_json.get("error", {}).get("status")
+                if error_status == 'PERMISSION_DENIED':
+                    error_message = error_json.get("error", {}).get("message", "")
+                    raise Exception("Access was denied with the following error: %s. Have you enabled the Sheets API? Have you shared the spreadsheet with %s?" % (error_message, self.email))
+                if error_status == 'NOT_FOUND':
+                    raise Exception("Trying to open non-existent spreadsheet document. Verify the document id exists (%s)." % document_id)
+            raise Exception("The Google API returned an error: %s" % error)
