@@ -4,7 +4,7 @@ import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role, get_recipe_config
 from googlesheets import GoogleSheetsSession
 from safe_logger import SafeLogger
-from googlesheets_common import get_credentials
+from googlesheets_common import extract_credentials
 
 
 logger = SafeLogger("googlesheets plugin", ["credentials"])
@@ -26,7 +26,7 @@ output_dataset.write_schema(input_schema)
 # Get configuration
 config = get_recipe_config()
 logger.info("config parameters: {}".format(logger.filter_secrets(config)))
-credentials = get_credentials(config)
+credentials = extract_credentials(config)
 doc_id = config.get("doc_id")
 tab_id = config.get("tab_id")
 insert_format = config.get("insert_format")
@@ -71,7 +71,7 @@ def serializer(obj):
 
 
 # Open writer
-writer = output_dataset.get_writer()        
+writer = output_dataset.get_writer()
 
 
 # Iteration row by row

@@ -8,7 +8,7 @@ from safe_logger import SafeLogger
 logger = SafeLogger("googlesheets plugin", ["credentials"])
 
 
-def get_credentials(input_credentials):
+def _get_service_account_credentials(input_credentials):
     """
     Takes the input param 'credentials' that can accept a JSON token or a path to a file
     and returns a dict.
@@ -36,7 +36,7 @@ class GoogleSheetsSession():
     ]
 
     def __init__(self, credentials):
-        credentials = get_credentials(credentials)
+        credentials = _get_service_account_credentials(credentials)
         self.client = gspread.authorize(
             ServiceAccountCredentials.from_json_keyfile_dict(
                 credentials,
