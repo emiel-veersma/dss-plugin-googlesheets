@@ -38,7 +38,7 @@ class GoogleSheetsSession():
 
     def __init__(self, credentials, credentials_type="preset-service-account"):
         self.client = None
-        if credentials_type == "preset-service-account":
+        if credentials_type == "service-account":
             credentials = _get_service_account_credentials(credentials)
             self.client = gspread.authorize(
                 ServiceAccountCredentials.from_json_keyfile_dict(
