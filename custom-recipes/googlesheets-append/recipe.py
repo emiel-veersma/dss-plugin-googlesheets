@@ -27,7 +27,11 @@ config = get_recipe_config()
 logger.info("config parameters: {}".format(logger.filter_secrets(config)))
 credentials = config.get("credentials")
 doc_id = config.get("doc_id")
+if not doc_id:
+    raise ValueError("The document id is not provided")
 tab_id = config.get("tab_id")
+if not tab_id:
+    raise ValueError("The sheet name is not provided")
 insert_format = config.get("insert_format")
 session = GoogleSheetsSession(credentials)
 
