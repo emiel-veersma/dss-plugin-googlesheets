@@ -2,10 +2,11 @@ import json
 import os.path
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from oauth2client.client import AccessTokenCredentials
 from safe_logger import SafeLogger
 
 
-logger = SafeLogger("googlesheets plugin", ["credentials"])
+logger = SafeLogger("googlesheets plugin", ["credentials", "access_token"])
 
 
 def _get_service_account_credentials(input_credentials):
@@ -35,15 +36,22 @@ class GoogleSheetsSession():
         'https://www.googleapis.com/auth/spreadsheets'
     ]
 
-    def __init__(self, credentials):
-        credentials = _get_service_account_credentials(credentials)
-        self.client = gspread.authorize(
-            ServiceAccountCredentials.from_json_keyfile_dict(
-                credentials,
-                self.scope
+    def __init__(self, credentials, credentials_type="preset-service-account"):
+        self.client = None
+        if credentials_type == "service-account":
+            credentials = _get_service_account_credentials(credentials)
+            self.client = gspread.authorize(
+                ServiceAccountCredentials.from_json_keyfile_dict(
+                    credentials,
+                    self.scope
+                )
             )
-        )
-        self.email = credentials.get("client_email", "(email missing)")
+            self.email = credentials.get("client_email", "(email missing)")
+        else:
+            self.client = gspread.authorize(
+                AccessTokenCredentials(credentials, "dss-googledrive-plugin/2.0")
+            )
+            self.email = "(email missing)"
 
     def get_spreadsheet(self, document_id, tab_id):
         return self.get_spreadsheets(document_id, tab_id)[0]
