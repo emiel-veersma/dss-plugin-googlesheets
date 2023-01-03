@@ -6,7 +6,7 @@ from oauth2client.client import AccessTokenCredentials
 from safe_logger import SafeLogger
 
 
-logger = SafeLogger("googlesheets plugin", ["credentials"])
+logger = SafeLogger("googlesheets plugin", ["credentials", "access_token"])
 
 
 def _get_service_account_credentials(input_credentials):
