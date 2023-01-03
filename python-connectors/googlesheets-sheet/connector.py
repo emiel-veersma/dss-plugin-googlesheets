@@ -5,17 +5,17 @@ from gspread.utils import rowcol_to_a1
 from slugify import slugify
 from googlesheets import GoogleSheetsSession
 from safe_logger import SafeLogger
-from googlesheets_common import extract_credentials
+from googlesheets_common import DSSConstants, extract_credentials
 
 
-logger = SafeLogger("googlesheets plugin", ["credentials"])
+logger = SafeLogger("googlesheets plugin", ["credentials", "access_token"])
 
 
 class MyConnector(Connector):
 
     def __init__(self, config):
         Connector.__init__(self, config)  # pass the parameters to the base class
-        logger.info("GoogleSheets connector v1.2.0 starting with {}".format(logger.filter_secrets(config)))
+        logger.info("GoogleSheets connector v{} starting with {}".format(DSSConstants.PLUGIN_VERSION, logger.filter_secrets(config)))
         credentials, credentials_type = extract_credentials(config)
         self.session = GoogleSheetsSession(credentials, credentials_type)
         self.doc_id = self.config.get("doc_id")
@@ -105,6 +105,8 @@ class MyConnector(Connector):
         """
         Returns the count of records for the dataset (or a partition).
         """
+        # row_count currently rounds up to 1000 records
+        # For this reason, canCountRecords is set to false and this method is currently ignored by DSS
         worksheet = self.session.get_spreadsheet(self.doc_id, self.tab_id)
 
         if self.result_format == 'first-row-header':

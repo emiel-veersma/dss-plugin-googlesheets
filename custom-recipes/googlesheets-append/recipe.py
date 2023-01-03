@@ -4,12 +4,12 @@ import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role, get_recipe_config
 from googlesheets import GoogleSheetsSession
 from safe_logger import SafeLogger
-from googlesheets_common import extract_credentials
+from googlesheets_common import DSSConstants, extract_credentials
 
 
-logger = SafeLogger("googlesheets plugin", ["credentials"])
+logger = SafeLogger("googlesheets plugin", ["credentials", "access_token"])
 
-logger.info("GoogleSheets custom recipe v1.2.0 starting")
+logger.info("GoogleSheets custom recipe v{} starting".format(DSSConstants.PLUGIN_VERSION))
 
 # Input
 input_name = get_input_names_for_role('input_role')[0]
