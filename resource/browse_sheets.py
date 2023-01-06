@@ -21,7 +21,7 @@ def build_select_choices(choices=None):
 def do(payload, config, plugin_config, inputs):
     if "config" in config:
         config = config.get("config")
-    if "auth_type" not in config:
+    if ("auth_type" not in config) and ("credentials" not in config):
         return build_select_choices("Select a type of authentication")
     credentials, credentials_type, error_message = extract_credentials(config, can_raise=False)
     if error_message:
