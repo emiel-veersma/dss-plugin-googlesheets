@@ -45,5 +45,3 @@ def do(payload, config, plugin_config, inputs):
                 "value": worksheet_title
             })
         return build_select_choices(choices)
-    elif parameter_name == "secret_parameter":
-        return build_select_choices("{}".format(root_model))
