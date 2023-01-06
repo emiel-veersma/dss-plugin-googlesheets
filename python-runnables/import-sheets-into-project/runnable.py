@@ -25,6 +25,7 @@ class GoogleSheetsToDatasetsImporter(Runnable):
         dss_client = dataiku.api_client()
         self.project = dss_client.get_project(project_key)
         self.project_datasets = list_project_datasets_names(self.project)
+        self.creation_mode = self.config.get("creation_mode", "create-new")
 
     def get_progress_target(self):
         """
@@ -50,7 +51,10 @@ class GoogleSheetsToDatasetsImporter(Runnable):
 
         result_table = ResultTable()
         result_table.add_column("actions", "Actions", "STRING")
-        worksheets_titles = []
+        if self.creation_mode == "create-new":
+            worksheets_titles = self.project_datasets.copy()
+        else:
+            worksheets_titles = []
         for worksheet in worksheets:
             worksheet_title = worksheet.title
             worksheets_titles.append("{}_{}".format(spreadsheet_title, worksheet_title))
@@ -61,6 +65,8 @@ class GoogleSheetsToDatasetsImporter(Runnable):
                 rows = worksheet.get_all_values()
                 dataset_title = unique_worksheet_title
                 if dataset_title in self.project_datasets:
+                    if self.creation_mode == "skip":
+                        continue
                     dataset = self.project.get_dataset(dataset_title)
                 else:
                     params = {

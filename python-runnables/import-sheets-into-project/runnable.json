@@ -60,6 +60,26 @@
             "getChoicesFromPython": true
         },
         {
+            "name": "creation_mode",
+            "label": "Dataset creation mode",
+            "type": "SELECT",
+            "selectChoices": [
+                {
+                    "value": "create-new",
+                    "label": "Create new datasets if already exist"
+                },
+                {
+                    "value": "overwrite",
+                    "label": "Overwrite the existing datasets"
+                },
+                {
+                    "value": "skip",
+                    "label": "Skip the existing datasets"
+                }
+            ],
+            "defaultValue": "create-new"
+        },
+        {
             "name": "result_format",
             "label": "Format",
             "type": "SELECT",
