@@ -8,6 +8,9 @@
     "writable" : true,
     "canCountRecords" : false,
 
+    "kind": "PYTHON",
+    "paramsPythonSetup": "browse_sheets.py",
+
     "params": [
         {
             "name": "auth_type",
@@ -59,7 +62,20 @@
         {
             "name": "tab_id",
             "label": "Sheet name",
-            "type": "STRING"
+            "type": "STRING",
+            "visibilityCondition": "model.tab_id!=null"
+        },
+        {
+            "name": "tabs_ids",
+            "label": "Sheets",
+            "type": "MULTISELECT",
+            "getChoicesFromPython": true
+        },
+        {
+            "name": "add_sheet_name_column",
+            "label": " ",
+            "description": "Add sheet name column",
+            "type": "BOOLEAN"
         },
         {
             "name": "result_format",
