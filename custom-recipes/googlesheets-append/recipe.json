@@ -77,7 +77,8 @@
         },
         {
             "name": "tab_id",
-            "label": "Sheet name",
+            "label": "Sheet name (legacy)",
+            "description": "Please use the selector below",
             "type": "STRING",
             "visibilityCondition": "model.tabs_ids==null && model.tab_id!=null"
         },
