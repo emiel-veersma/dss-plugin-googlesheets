@@ -119,11 +119,11 @@
             "defaultValue": "RAW"
         },
         {
-            "name": "secret_parameter",
-            "label": "This secret parameter has no label, because of its secrecy.",
-            "type": "SELECT",
-            "visibilityCondition": false,
-            "getChoicesFromPython": true
+            "name": "is_dry_run",
+            "label": "Dry run",
+            "description": "Only display the actions that would be taken",
+            "type": "BOOLEAN",
+            "defaultValue": true
         }
     ],
     "permissions": [],
