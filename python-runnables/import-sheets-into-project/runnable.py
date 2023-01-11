@@ -23,7 +23,7 @@ class GoogleSheetsToDatasetsImporter(Runnable):
         self.is_dry_run = self.config.get("is_dry_run", True)
         self.plugin_config = plugin_config
         self.doc_id = self.config.get("doc_id")
-        self.tabs_ids = self.config.get("tabs_ids")
+        self.tabs_ids = self.config.get("tabs_ids", [])
         self.result_format = self.config.get("result_format")
         self.write_format = self.config.get("write_format")
         credentials, credentials_type = extract_credentials(config)
@@ -32,20 +32,23 @@ class GoogleSheetsToDatasetsImporter(Runnable):
         self.project = dss_client.get_project(project_key)
         self.project_datasets = list_project_datasets_names(self.project)
         self.creation_mode = self.config.get("creation_mode", "create-new")
+        self.worksheets = self.session.get_spreadsheets(self.doc_id)
+        if not self.tabs_ids:
+            for worksheet in self.worksheets:
+                self.tabs_ids.append(worksheet.title)
 
     def get_progress_target(self):
         """
         If the runnable will return some progress info, have this function return a tuple of 
         (target, unit) where unit is one of: SIZE, FILES, RECORDS, NONE
         """
-        return None
+        return (len(self.tabs_ids), 'FILES')
 
     def run(self, progress_callback):
         """
         Do stuff here. Can return a string or raise an exception.
         The progress_callback is a function expecting 1 value: current progress
         """
-        worksheets = self.session.get_spreadsheets(self.doc_id)
         spreadsheet_title = self.session.get_spreadsheet_title(self.doc_id)
         if not spreadsheet_title:
             spreadsheet_title = "Nameless spreadsheet"
@@ -64,7 +67,10 @@ class GoogleSheetsToDatasetsImporter(Runnable):
             worksheets_titles = self.project_datasets.copy()
         else:
             worksheets_titles = []
-        for worksheet in worksheets:
+        index = 0
+        for worksheet in self.worksheets:
+            index += 1
+            progress_callback(index)
             dataset = None
             worksheet_title = worksheet.title
             worksheets_titles.append("{}_{}".format(spreadsheet_title, worksheet_title))
