@@ -55,10 +55,16 @@
         },
         {
             "name": "tabs_ids",
-            "label": "Sheets",
-            "description": "Keep blank to import all the document's sheets",
+            "label": "Sheets to import",
             "type": "MULTISELECT",
             "getChoicesFromPython": true
+        },
+        {
+            "name": "Warning",
+            "type": "SEPARATOR",
+            "label": " ",
+            "description": "⚠️ All sheets will be imported if 'Sheets to import' selector is left blank",
+            "visibilityCondition": "model.doc_id!= null && model.tabs_ids.length==0"
         },
         {
             "name": "creation_mode",

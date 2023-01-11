@@ -78,7 +78,9 @@ class GoogleSheetsToDatasetsImporter(Runnable):
             unique_worksheet_title = worksheets_titles[-1:][0]
 
             if worksheet_title in self.tabs_ids:
-                rows = worksheet.get_all_values()
+                rows = []
+                if not self.is_dry_run:
+                    rows = worksheet.get_all_values()
                 dataset_title = unique_worksheet_title
                 if dataset_title in self.project_datasets:
                     if self.creation_mode == "skip":
