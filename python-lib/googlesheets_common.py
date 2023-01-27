@@ -1,3 +1,6 @@
+import datetime
+
+
 class DSSConstants(object):
     EMPTY_CREDENTIALS_ERROR_MESSAGES = {
         "default": "Please select a type of authentication",
@@ -7,6 +10,8 @@ class DSSConstants(object):
     }
     DEFAULT_DATASET_FORMAT = {'separator': '\t', 'style': 'unix', 'compress': ''}
     PLUGIN_VERSION = '1.2.0'
+    DSS_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+    GSPREAD_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
 
 def extract_credentials(config, can_raise=True):
@@ -72,3 +77,14 @@ def get_unique_slugs(list_of_names):
             test_string = slug_name + '_' + str(i)
         list_unique_slugs.append(test_string)
     return list_unique_slugs
+
+
+def format_date(date, from_format, to_format):
+    if date:
+        ret = datetime.datetime.strftime(
+            datetime.datetime.strptime(date, from_format),
+            to_format
+        )
+        return ret
+    else:
+        return date
