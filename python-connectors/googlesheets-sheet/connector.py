@@ -5,7 +5,7 @@ from gspread.utils import rowcol_to_a1
 from slugify import slugify
 from googlesheets import GoogleSheetsSession
 from safe_logger import SafeLogger
-from googlesheets_common import DSSConstants, extract_credentials, get_tab_ids, format_date
+from googlesheets_common import DSSConstants, extract_credentials, get_tab_ids, mark_date_columns, convert_dates_in_row
 
 
 logger = SafeLogger("googlesheets plugin", ["credentials", "access_token"])
@@ -127,22 +127,11 @@ class MyCustomDatasetWriter(CustomDatasetWriter):
         self.buffer = []
         self.date_columns = []
         if self.parent.write_format == "USER_ENTERED":
-            self.date_columns = self.mark_date_columns(dataset_schema)
+            self.date_columns = mark_date_columns(dataset_schema)
             logger.info("Columns #{} are marked for date conversion".format(self.date_columns))
         columns = [column["name"] for column in dataset_schema["columns"]]
         if parent.result_format == 'first-row-header':
             self.buffer.append(columns)
-
-    def mark_date_columns(self, schema):
-        date_columns = []
-        columns = schema.get("columns", [])
-        column_index = 0
-        for column in columns:
-            column_type = column.get("type", "string")
-            if column_type == "date":
-                date_columns.append(column_index)
-            column_index += 1
-        return date_columns
 
     def write_row(self, row):
         if self.date_columns:
@@ -165,10 +154,3 @@ class MyCustomDatasetWriter(CustomDatasetWriter):
     def close(self):
         self.flush()
         pass
-
-
-def convert_dates_in_row(row, date_columns):
-    for date_column in date_columns:
-        row[date_column] = format_date(
-            row[date_column], DSSConstants.DSS_DATE_FORMAT, DSSConstants.GSPREAD_DATE_FORMAT)
-    return row
