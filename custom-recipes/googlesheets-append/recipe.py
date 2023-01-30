@@ -71,7 +71,7 @@ worksheet.append_rows = append_rows.__get__(worksheet, worksheet.__class__)
 # Handle datetimes serialization
 def serializer(obj):
     if isinstance(obj, datetime.datetime):
-        return obj.isoformat()
+        return obj.strftime(DSSConstants.GSPREAD_DATE_FORMAT)
     return obj
 
 
