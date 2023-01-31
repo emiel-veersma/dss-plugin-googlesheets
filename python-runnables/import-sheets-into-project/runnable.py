@@ -67,15 +67,15 @@ class GoogleSheetsToDatasetsImporter(Runnable):
             worksheets_titles = []
         index = 0
         for worksheet in self.worksheets:
-            index += 1
-            progress_callback(index)
-            dataset = None
             worksheet_title = worksheet.title
-            worksheets_titles.append("{}_{}".format(spreadsheet_title, worksheet_title))
-            worksheets_titles = get_unique_slugs(worksheets_titles)
-            unique_worksheet_title = worksheets_titles[-1]
-
             if worksheet_title in self.tabs_ids:
+                index += 1
+                progress_callback(index)
+                dataset = None
+                worksheets_titles.append("{}_{}".format(spreadsheet_title, worksheet_title))
+                worksheets_titles = get_unique_slugs(worksheets_titles)
+                unique_worksheet_title = worksheets_titles[-1]
+
                 rows = []
                 if not self.is_dry_run:
                     rows = worksheet.get_all_values()
