@@ -103,7 +103,7 @@
         {
             "name": "write_format",
             "label": "Values interpretation (write mode)",
-            "description": "In write mode, how data is interpretated by the spreadsheet",
+            "description": "In write mode, how data is interpreted by the spreadsheet",
             "type": "SELECT",
             "selectChoices": [
                 {

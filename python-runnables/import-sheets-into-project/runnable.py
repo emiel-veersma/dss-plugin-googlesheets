@@ -1,6 +1,6 @@
 import dataiku
 from dataiku.runnables import Runnable, ResultTable
-from googlesheets_common import DSSConstants, extract_credentials, get_unique_slugs
+from googlesheets_common import DSSConstants, extract_credentials, get_unique_slugs, get_unique_names
 from googlesheets import GoogleSheetsSession
 from safe_logger import SafeLogger
 
@@ -24,8 +24,6 @@ class GoogleSheetsToDatasetsImporter(Runnable):
         self.plugin_config = plugin_config
         self.doc_id = self.config.get("doc_id")
         self.tabs_ids = self.config.get("tabs_ids", [])
-        self.result_format = self.config.get("result_format")
-        self.write_format = self.config.get("write_format")
         credentials, credentials_type = extract_credentials(config)
         self.session = GoogleSheetsSession(credentials, credentials_type)
         dss_client = dataiku.api_client()
@@ -75,12 +73,14 @@ class GoogleSheetsToDatasetsImporter(Runnable):
             worksheet_title = worksheet.title
             worksheets_titles.append("{}_{}".format(spreadsheet_title, worksheet_title))
             worksheets_titles = get_unique_slugs(worksheets_titles)
-            unique_worksheet_title = worksheets_titles[-1:][0]
+            unique_worksheet_title = worksheets_titles[-1]
 
             if worksheet_title in self.tabs_ids:
                 rows = []
                 if not self.is_dry_run:
                     rows = worksheet.get_all_values()
+                if not rows:
+                    continue
                 dataset_title = unique_worksheet_title
                 if dataset_title in self.project_datasets:
                     if self.creation_mode == "skip":
@@ -105,7 +105,7 @@ class GoogleSheetsToDatasetsImporter(Runnable):
                 if not self.is_dry_run:
                     set_dataset_as_managed(dataset)
                     output_dataset = dataiku.Dataset(dataset_title)
-                    column_names = rows[0]
+                    column_names = get_unique_names(rows[0])
                     schema = []
                     for column_name in column_names:
                         schema.append({"name": column_name, "type": "string"})
