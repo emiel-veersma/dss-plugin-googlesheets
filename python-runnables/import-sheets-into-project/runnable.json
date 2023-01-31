@@ -70,60 +70,22 @@
             "name": "creation_mode",
             "label": "Dataset creation mode",
             "type": "SELECT",
+            "description": "Specify what to do if a dataset with same name already exists",
             "selectChoices": [
                 {
                     "value": "create-new",
-                    "label": "Create new datasets if already exist"
+                    "label": "Create new datasets with new names"
                 },
                 {
                     "value": "overwrite",
-                    "label": "Overwrite the existing datasets"
+                    "label": "Overwrite existing datasets"
                 },
                 {
                     "value": "skip",
-                    "label": "Skip the existing datasets"
+                    "label": "Skip existing datasets"
                 }
             ],
             "defaultValue": "create-new"
-        },
-        {
-            "name": "result_format",
-            "label": "Format",
-            "type": "SELECT",
-            "selectChoices": [
-                {
-                    "value": "first-row-header",
-                    "label": "First row contains column headers"
-                },
-                {
-                    "value": "no-header",
-                    "label": "First row contains data (not recommended)"
-                },
-                {
-                    "value": "json",
-                    "label": "JSON (read mode only)"
-                }
-            ],
-            "mandatory": true,
-            "defaultValue": "first-row-header"
-        },
-        {
-            "name": "write_format",
-            "label": "Values interpretation (write mode)",
-            "description": "In write mode, how data is interpretated by the spreadsheet",
-            "type": "SELECT",
-            "selectChoices": [
-                {
-                    "value": "RAW",
-                    "label": "RAW: not parsed, stored as-is (default)"
-                },
-                {
-                    "value": "USER_ENTERED",
-                    "label": "USER_ENTERED: as if the user typed them into the UI"
-                }
-            ],
-            "mandatory": true,
-            "defaultValue": "RAW"
         },
         {
             "name": "is_dry_run",

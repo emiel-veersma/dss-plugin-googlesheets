@@ -81,6 +81,21 @@ def get_unique_slugs(list_of_names):
     return list_unique_slugs
 
 
+def get_unique_names(list_of_names):
+    list_unique_slugs = []
+    for name in list_of_names:
+        slug_name = name
+        if slug_name == '':
+            slug_name = 'none'
+        test_string = slug_name
+        i = 0
+        while test_string in list_unique_slugs:
+            i += 1
+            test_string = slug_name + '_' + str(i)
+        list_unique_slugs.append(test_string)
+    return list_unique_slugs
+
+
 def mark_date_columns(schema):
     date_columns = []
     columns = schema.get("columns", [])
