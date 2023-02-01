@@ -11,7 +11,7 @@ class DSSConstants(object):
     DEFAULT_DATASET_FORMAT = {'separator': '\t', 'style': 'unix', 'compress': ''}
     PLUGIN_VERSION = '1.2.0'
     DSS_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-    GSPREAD_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
+    GSPREAD_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 def extract_credentials(config, can_raise=True):
