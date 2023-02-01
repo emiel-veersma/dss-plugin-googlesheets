@@ -3,6 +3,7 @@ import datetime
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role, get_recipe_config
 from googlesheets import GoogleSheetsSession
+from gspread.utils import rowcol_to_a1
 from safe_logger import SafeLogger
 from googlesheets_common import DSSConstants, extract_credentials, get_tab_ids
 
@@ -35,6 +36,7 @@ if not tabs_ids:
     raise ValueError("The sheet name is not provided")
 tab_id = tabs_ids[0]
 insert_format = config.get("insert_format")
+write_mode = config.get("write_mode", "append")
 session = GoogleSheetsSession(credentials, credentials_type)
 
 
@@ -75,26 +77,41 @@ def serializer(obj):
     return obj
 
 
+def flush_data(worksheet, batch, write_mode, insert_format):
+    if write_mode == "append":
+        worksheet.append_rows(batch, insert_format)
+    else:
+        num_columns = len(batch[0])
+        num_lines = len(batch)
+        worksheet.resize(rows=num_lines, cols=num_columns)
+        range = 'A1:%s' % rowcol_to_a1(num_lines, num_columns)
+        worksheet.update(range, batch, value_input_option=insert_format)
+
+
 # Open writer
 writer = output_dataset.get_writer()
 
 
 # Iteration row by row
 batch = []
+if write_mode == "overwrite":
+    worksheet.resize(rows=1, cols=1)
+    columns = [column["name"] for column in input_schema]
+    batch.append(columns)
 for row in input_dataset.iter_rows():
 
     # write to spreadsheet by batch
     batch.append([serializer(v) for k, v in list(row.items())])
 
     if len(batch) >= 50:
-        worksheet.append_rows(batch, insert_format)
+        flush_data(worksheet, batch, write_mode, insert_format)
         batch = []
 
     # write to output dataset
     writer.write_row_dict(row)
 
 if len(batch) > 0:
-    worksheet.append_rows(batch, insert_format)
+    flush_data(worksheet, batch, write_mode, insert_format)
 
 # Close writer
 writer.close()
