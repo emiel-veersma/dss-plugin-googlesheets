@@ -99,7 +99,7 @@
             "label": "Sheet name (legacy)",
             "description": "Please use the selector below",
             "type": "STRING",
-            "visibilityCondition": "model.tabs_ids==null && model.tab_id!=null"
+            "visibilityCondition": "model.tabs_ids==null && model.tab_id!=null && model.tab_id!=''"
         },
         {
             "name": "tabs_ids",
