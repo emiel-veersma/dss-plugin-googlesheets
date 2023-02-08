@@ -71,11 +71,22 @@ worksheet.append_rows = append_rows.__get__(worksheet, worksheet.__class__)
 
 
 # Handle datetimes serialization
-def serializer(obj):
+def serializer_iso(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    return obj
+
+
+def serializer_dss(obj):
     if isinstance(obj, datetime.datetime):
         return obj.strftime(DSSConstants.GSPREAD_DATE_FORMAT)
     return obj
 
+
+if insert_format == "USER_ENTERED":
+    serializer = serializer_dss
+else:
+    serializer = serializer_iso
 
 # Open writer
 writer = output_dataset.get_writer()
