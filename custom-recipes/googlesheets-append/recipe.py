@@ -77,17 +77,6 @@ def serializer(obj):
     return obj
 
 
-def flush_data(worksheet, batch, write_mode, insert_format):
-    if write_mode == "append":
-        worksheet.append_rows(batch, insert_format)
-    else:
-        num_columns = len(batch[0])
-        num_lines = len(batch)
-        worksheet.resize(rows=num_lines, cols=num_columns)
-        range = 'A1:%s' % rowcol_to_a1(num_lines, num_columns)
-        worksheet.update(range, batch, value_input_option=insert_format)
-
-
 # Open writer
 writer = output_dataset.get_writer()
 
@@ -95,7 +84,7 @@ writer = output_dataset.get_writer()
 # Iteration row by row
 batch = []
 if write_mode == "overwrite":
-    worksheet.resize(rows=1, cols=1)
+    worksheet.clear()
     columns = [column["name"] for column in input_schema]
     batch.append(columns)
 for row in input_dataset.iter_rows():
@@ -104,14 +93,14 @@ for row in input_dataset.iter_rows():
     batch.append([serializer(v) for k, v in list(row.items())])
 
     if len(batch) >= 50:
-        flush_data(worksheet, batch, write_mode, insert_format)
+        worksheet.append_rows(batch, insert_format)
         batch = []
 
     # write to output dataset
     writer.write_row_dict(row)
 
 if len(batch) > 0:
-    flush_data(worksheet, batch, write_mode, insert_format)
+    worksheet.append_rows(batch, insert_format)
 
 # Close writer
 writer.close()
