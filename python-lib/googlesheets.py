@@ -58,6 +58,8 @@ class GoogleSheetsSession():
 
     def get_spreadsheets(self, document_id, tab_id=None):
         try:
+            # worksheet and worksheets both make a single fetch_sheet_metadata request
+            # so better use one worksheets than multiple worksheet
             if tab_id:
                 return [self.client.open_by_key(document_id).worksheet(tab_id)]
             else:
@@ -68,6 +70,27 @@ class GoogleSheetsSession():
         except gspread.exceptions.WorksheetNotFound as error:
             logger.error("{}".format(error))
             raise Exception("Trying to open non-existent sheet. Verify that the sheet name exists (%s)." % tab_id)
+        except gspread.exceptions.APIError as error:
+            if hasattr(error, 'response'):
+                error_json = error.response.json()
+                logger.error(error_json)
+                error_status = error_json.get("error", {}).get("status")
+                if error_status == 'PERMISSION_DENIED':
+                    error_message = error_json.get("error", {}).get("message", "")
+                    raise Exception("Access was denied with the following error: %s. Have you enabled the Sheets API? Have you shared the spreadsheet with %s?" % (error_message, self.email))
+                if error_status == 'NOT_FOUND':
+                    raise Exception("Trying to open non-existent spreadsheet document. Verify the document id exists (%s)." % document_id)
+            raise Exception("The Google API returned an error: %s" % error)
+
+    def get_spreadsheet_title(self, document_id):
+        try:
+            return self.client.open_by_key(document_id).title
+        except gspread.exceptions.SpreadsheetNotFound as error:
+            logger.error("{}".format(error))
+            raise Exception("Trying to open non-existent or inaccessible spreadsheet document.")
+        except gspread.exceptions.WorksheetNotFound as error:
+            logger.error("{}".format(error))
+            raise Exception("Trying to open non-existent sheet. Verify that the sheet name exists (%s)." % document_id)
         except gspread.exceptions.APIError as error:
             if hasattr(error, 'response'):
                 error_json = error.response.json()

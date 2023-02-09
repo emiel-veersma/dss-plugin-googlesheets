@@ -3,8 +3,9 @@ import datetime
 import dataiku
 from dataiku.customrecipe import get_input_names_for_role, get_output_names_for_role, get_recipe_config
 from googlesheets import GoogleSheetsSession
+from gspread.utils import rowcol_to_a1
 from safe_logger import SafeLogger
-from googlesheets_common import DSSConstants, extract_credentials
+from googlesheets_common import DSSConstants, extract_credentials, get_tab_ids
 
 
 logger = SafeLogger("googlesheets plugin", ["credentials", "access_token"])
@@ -30,10 +31,12 @@ credentials, credentials_type = extract_credentials(config)
 doc_id = config.get("doc_id")
 if not doc_id:
     raise ValueError("The document id is not provided")
-tab_id = config.get("tab_id")
-if not tab_id:
+tabs_ids = get_tab_ids(config)
+if not tabs_ids:
     raise ValueError("The sheet name is not provided")
+tab_id = tabs_ids[0]
 insert_format = config.get("insert_format")
+write_mode = config.get("write_mode", "append")
 session = GoogleSheetsSession(credentials, credentials_type)
 
 
@@ -68,11 +71,22 @@ worksheet.append_rows = append_rows.__get__(worksheet, worksheet.__class__)
 
 
 # Handle datetimes serialization
-def serializer(obj):
+def serializer_iso(obj):
     if isinstance(obj, datetime.datetime):
         return obj.isoformat()
     return obj
 
+
+def serializer_dss(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.strftime(DSSConstants.GSPREAD_DATE_FORMAT)
+    return obj
+
+
+if insert_format == "USER_ENTERED":
+    serializer = serializer_dss
+else:
+    serializer = serializer_iso
 
 # Open writer
 writer = output_dataset.get_writer()
@@ -80,6 +94,10 @@ writer = output_dataset.get_writer()
 
 # Iteration row by row
 batch = []
+if write_mode == "overwrite":
+    worksheet.clear()
+    columns = [column["name"] for column in input_schema]
+    batch.append(columns)
 for row in input_dataset.iter_rows():
 
     # write to spreadsheet by batch

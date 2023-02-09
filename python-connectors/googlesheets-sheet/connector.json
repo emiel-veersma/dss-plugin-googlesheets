@@ -8,6 +8,9 @@
     "writable" : true,
     "canCountRecords" : false,
 
+    "kind": "PYTHON",
+    "paramsPythonSetup": "browse_sheets.py",
+
     "params": [
         {
             "name": "auth_type",
@@ -58,8 +61,30 @@
         },
         {
             "name": "tab_id",
-            "label": "Sheet name",
-            "type": "STRING"
+            "label": "Sheet name (legacy)",
+            "description": "Please use the Sheets names selector below",
+            "type": "STRING",
+            "visibilityCondition": "model.tab_id!=null && model.tab_id!='' && model.tabs_ids.length==0"
+        },
+        {
+            "name": "tabs_ids",
+            "label": "Sheets names",
+            "description": "Leave empty for all sheets",
+            "type": "MULTISELECT",
+            "getChoicesFromPython": true
+        },
+        {
+            "name": "add_sheet_name_column",
+            "label": " ",
+            "description": "Add sheet name column",
+            "type": "BOOLEAN"
+        },
+        {
+            "name": "show_advanced_parameters",
+            "label": " ",
+            "description": "Show advanced parameters",
+            "type": "BOOLEAN",
+            "defaultValue": false
         },
         {
             "name": "result_format",
@@ -80,25 +105,27 @@
                 }
             ],
             "mandatory": true,
-            "defaultValue": "first-row-header"
+            "defaultValue": "first-row-header",
+            "visibilityCondition": "model.show_advanced_parameters==true"
         },
         {
             "name": "write_format",
             "label": "Values interpretation (write mode)",
-            "description": "In write mode, how data is interpretated by the spreadsheet",
+            "description": "In write mode, how data is interpreted by the spreadsheet",
             "type": "SELECT",
             "selectChoices": [
                 {
                     "value": "RAW",
-                    "label": "RAW: not parsed, stored as-is (default)"
+                    "label": "Raw: store as is"
                 },
                 {
                     "value": "USER_ENTERED",
-                    "label": "USER_ENTERED: as if the user typed them into the UI"
+                    "label": "Format numbers, dates, or currencies in the spreadsheet"
                 }
             ],
             "mandatory": true,
-            "defaultValue": "RAW"
+            "defaultValue": "USER_ENTERED",
+            "visibilityCondition": "model.show_advanced_parameters==true"
         }
     ]
 }
