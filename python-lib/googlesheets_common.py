@@ -1,3 +1,6 @@
+import datetime
+
+
 class DSSConstants(object):
     EMPTY_CREDENTIALS_ERROR_MESSAGES = {
         "default": "Please select a type of authentication",
@@ -7,6 +10,8 @@ class DSSConstants(object):
     }
     DEFAULT_DATASET_FORMAT = {'separator': '\t', 'style': 'unix', 'compress': ''}
     PLUGIN_VERSION = '1.2.0'
+    DSS_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+    GSPREAD_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 def extract_credentials(config, can_raise=True):
@@ -52,7 +57,70 @@ def get_tab_ids(config):
     legacy_tab_id = config.get("tab_id", None)
     tabs_ids = config.get("tabs_ids")
     tabs_ids = tabs_ids or []
+    if type(tabs_ids) == str:
+        tabs_ids = [tabs_ids]
     if not tabs_ids:
         if legacy_tab_id:
             return [legacy_tab_id]
     return tabs_ids
+
+
+def get_unique_slugs(list_of_names):
+    from slugify import slugify
+    list_unique_slugs = []
+    for name in list_of_names:
+        slug_name = slugify(name, separator="_", lowercase=False)
+        if slug_name == '':
+            slug_name = 'none'
+        test_string = slug_name
+        i = 0
+        while test_string in list_unique_slugs:
+            i += 1
+            test_string = slug_name + '_' + str(i)
+        list_unique_slugs.append(test_string)
+    return list_unique_slugs
+
+
+def get_unique_names(list_of_names):
+    list_unique_slugs = []
+    for name in list_of_names:
+        slug_name = name
+        if slug_name == '':
+            slug_name = 'none'
+        test_string = slug_name
+        i = 0
+        while test_string in list_unique_slugs:
+            i += 1
+            test_string = slug_name + '_' + str(i)
+        list_unique_slugs.append(test_string)
+    return list_unique_slugs
+
+
+def mark_date_columns(schema):
+    date_columns = []
+    columns = schema.get("columns", [])
+    column_index = 0
+    for column in columns:
+        column_type = column.get("type", "string")
+        if column_type == "date":
+            date_columns.append(column_index)
+        column_index += 1
+    return date_columns
+
+
+def format_date(date, from_format, to_format):
+    if date:
+        ret = datetime.datetime.strftime(
+            datetime.datetime.strptime(date, from_format),
+            to_format
+        )
+        return ret
+    else:
+        return date
+
+
+def convert_dates_in_row(row, date_columns):
+    for date_column in date_columns:
+        row[date_column] = format_date(
+            row[date_column], DSSConstants.DSS_DATE_FORMAT, DSSConstants.GSPREAD_DATE_FORMAT)
+    return row
