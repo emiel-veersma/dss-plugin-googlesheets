@@ -64,7 +64,7 @@
             "label": "Sheet name (legacy)",
             "description": "Please use the Sheets names selector below",
             "type": "STRING",
-            "visibilityCondition": "model.tab_id!=null && model.tab_id!='' && model.tabs_ids.length==0"
+            "visibilityCondition": "model.show_advanced_parameters==true || (model.tab_id!=null && model.tab_id!='' && model.tabs_ids.length==0)"
         },
         {
             "name": "tabs_ids",

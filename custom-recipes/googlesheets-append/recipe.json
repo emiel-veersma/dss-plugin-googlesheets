@@ -99,7 +99,7 @@
             "label": "Sheet name (legacy)",
             "description": "Please use the selector below",
             "type": "STRING",
-            "visibilityCondition": "model.tabs_ids==null && model.tab_id!=null && model.tab_id!=''"
+            "visibilityCondition": "model.show_advanced_parameters==true || (model.tabs_ids==null && model.tab_id!=null && model.tab_id!='')"
         },
         {
             "name": "tabs_ids",
@@ -124,6 +124,13 @@
             ],
             "mandatory": true,
             "defaultValue": "USER_ENTERED"
+        },
+        {
+            "name": "show_advanced_parameters",
+            "label": "Show advanced parameters",
+            "description": "",
+            "type": "BOOLEAN",
+            "defaultValue": false
         }
     ],
 
