@@ -1,10 +1,12 @@
 {
     "meta": {
-        "label": "Google Sheets - append recipe",
-        "description": "Appends the rows of the input dataset to a Google Sheets document"
+        "label": "Google Sheets - Write / append to a sheet",
+        "description": "Writes / appends the rows of the input dataset to a Google Sheets document"
     },
 
     "kind": "PYTHON",
+    "paramsPythonSetup": "browse_sheets.py",
+    "selectableFromDataset": "input_role",
 
     "inputRoles": [
         {
@@ -28,11 +30,44 @@
 
     "params": [
         {
+            "name": "auth_type",
+            "label": "Type of authentication",
+            "type": "SELECT",
+            "selectChoices": [
+                {
+                    "value": "single-sign-on",
+                    "label": "Single Sign On"
+                },
+                {
+                    "value": "preset-service-account",
+                    "label": "Service account preset"
+                },
+                {
+                    "value": "legacy-service-account",
+                    "label": "Service account credentials (legacy)"
+                }
+            ]
+        },
+        {
             "name": "credentials",
             "label": "Service Account credentials",
             "description": "Copy/paste the JSON private key provided by Google, or a path to a file containing the key. Click on the link above above to read how to get it.",
             "type": "TEXTAREA",
-            "mandatory" : true
+            "visibilityCondition": "model.auth_type == 'legacy-service-account' || (model.auth_type == null && model.credentials!=null)"
+        },
+        {
+            "name": "preset_credentials_service_account",
+            "label": "Service account preset",
+            "type": "PRESET",
+            "parameterSetId": "service-account",
+            "visibilityCondition": "model.auth_type == 'preset-service-account'"
+        },
+        {
+            "name": "oauth_credentials",
+            "label": "Single Sign On",
+            "type": "PRESET",
+            "parameterSetId": "single-sign-on",
+            "visibilityCondition": "model.auth_type == 'single-sign-on'"
         },
         {
             "name": "doc_id",
@@ -42,10 +77,35 @@
             "mandatory" : true
         },
         {
+            "name": "write_mode",
+            "label": "Write mode",
+            "description": " ",
+            "type": "SELECT",
+            "selectChoices": [
+                {
+                    "value": "append",
+                    "label": "Append to the sheet"
+                },
+                {
+                    "value": "overwrite",
+                    "label": "Overwrite the sheet"
+                }
+            ],
+            "mandatory": true,
+            "defaultValue": "append"
+        },
+        {
             "name": "tab_id",
-            "label": "Sheet name",
+            "label": "Sheet name (legacy)",
+            "description": "Please use the selector below",
             "type": "STRING",
-            "mandatory" : true
+            "visibilityCondition": "model.tabs_ids==null && model.tab_id!=null && model.tab_id!=''"
+        },
+        {
+            "name": "tabs_ids",
+            "label": "Sheet name",
+            "type": "SELECT",
+            "getChoicesFromPython": true
         },
         {
             "name": "insert_format",
@@ -55,15 +115,15 @@
             "selectChoices": [
                 {
                     "value": "RAW",
-                    "label": "RAW: not parsed, stored as-is (default)"
+                    "label": "Raw: store as is"
                 },
                 {
                     "value": "USER_ENTERED",
-                    "label": "USER_ENTERED: as if the user typed them into the UI"
+                    "label": "Format numbers, dates, or currencies in the spreadsheet"
                 }
             ],
             "mandatory": true,
-            "defaultValue": "RAW"
+            "defaultValue": "USER_ENTERED"
         }
     ],
 
