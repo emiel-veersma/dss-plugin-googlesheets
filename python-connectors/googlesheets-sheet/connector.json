@@ -64,7 +64,7 @@
             "label": "Sheet name (legacy)",
             "description": "Please use the Sheets names selector below",
             "type": "STRING",
-            "visibilityCondition": "model.tab_id!=null && model.tabs_ids.length==0"
+            "visibilityCondition": "model.tab_id!=null && model.tab_id!='' && model.tabs_ids.length==0"
         },
         {
             "name": "tabs_ids",
@@ -78,6 +78,13 @@
             "label": " ",
             "description": "Add sheet name column",
             "type": "BOOLEAN"
+        },
+        {
+            "name": "show_advanced_parameters",
+            "label": " ",
+            "description": "Show advanced parameters",
+            "type": "BOOLEAN",
+            "defaultValue": false
         },
         {
             "name": "result_format",
@@ -98,7 +105,8 @@
                 }
             ],
             "mandatory": true,
-            "defaultValue": "first-row-header"
+            "defaultValue": "first-row-header",
+            "visibilityCondition": "model.show_advanced_parameters==true"
         },
         {
             "name": "write_format",
@@ -108,15 +116,16 @@
             "selectChoices": [
                 {
                     "value": "RAW",
-                    "label": "RAW: not parsed, stored as-is (default)"
+                    "label": "Raw: store as is"
                 },
                 {
                     "value": "USER_ENTERED",
-                    "label": "USER_ENTERED: as if the user typed them into the UI"
+                    "label": "Format numbers, dates, or currencies in the spreadsheet"
                 }
             ],
             "mandatory": true,
-            "defaultValue": "RAW"
+            "defaultValue": "USER_ENTERED",
+            "visibilityCondition": "model.show_advanced_parameters==true"
         }
     ]
 }
