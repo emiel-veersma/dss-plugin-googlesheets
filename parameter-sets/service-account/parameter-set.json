@@ -11,6 +11,7 @@
     "params": [
         {
             "name": "credentials",
+            "label": "Service Account credentials",
             "description": "Copy/paste the JSON private key provided by Google.",
             "type": "PASSWORD"
         }
