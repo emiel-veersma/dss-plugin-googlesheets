@@ -97,7 +97,7 @@
         {
             "name": "tab_id",
             "label": "Sheet name (legacy)",
-            "description": "Legacy, please prefer using the \"Sheet name\" selector below.",
+            "description": "Legacy, please prefer using the \"Sheet name\" selector below",
             "type": "STRING",
             "visibilityCondition": "model.show_advanced_parameters==true || (model.tabs_ids==null && model.tab_id!=null && model.tab_id!='')"
         },
