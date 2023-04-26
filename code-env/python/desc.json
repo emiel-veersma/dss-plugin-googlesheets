@@ -4,7 +4,8 @@
         "PYTHON37",
         "PYTHON38",
         "PYTHON39",
-        "PYTHON310"
+        "PYTHON310",
+        "PYTHON311"
     ],
     "forceConda": false,
     "installCorePackages": true,
