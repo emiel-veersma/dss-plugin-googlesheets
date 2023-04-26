@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.2.1 - Feature release - 2023-04-24
+
+- Add support for python 3.7 to 3.11
+
 ## [Version 1.2.0](https://github.com/dataiku/dss-plugin-googlesheets/releases/tag/v1.2.0) - Feature abd bugfix release - 2022-11-24
 
 - Add a preset for storing access tokens
